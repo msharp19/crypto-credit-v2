@@ -1,0 +1,43 @@
+title Staking
+
+User->Staking Contract: Stake X stake(msg.value)
+Staking Contract->Staking Contract: Check X is supported
+Staking Contract->Staking Contract: Check minimum
+Staking Contract->Staking Contract: Check stake item allowance isApproved()
+Staking Contract->WETH Contract: Send N ETH deposit() where N is a configurable %
+WETH Contract->Staking Contract: transfer WETH
+Staking Contract->WETH Contract: Approve X for AAVE approve()
+Staking Contract->AAVE Contract: Deposit X with AAVE supply()
+AAVE Contract->Staking Contract: transfer AAVE staking tokens (atoken)
+Staking Contract->Staking Contract: Log open stake
+
+title Loan
+
+Admin->Staking Contract: Loan X to address Y
+Staking Contract->Staking Contract: Check minimum
+Staking Contract->Staking Contract: Check there is enough unencumbered collateral
+Staking Contract->Staking Contract: Update value available
+Staking Contract->AAVE Contract: Borrow X borrow()
+AAVE Contract->Staking Contract: transfer loan amount X
+Staking Contract ->Address Y: transfer loan amount to address Y
+
+title Payback
+
+Admin->WETH Contract: Update WETH allowance to AAVE for amount to withdraw approve()
+Admin->Staking Contract: Pay back loan for address Y 
+Staking Contract->Staking Contract: Check expected amount
+Staking Contract->WETH Contract: Check allowance to AAVE isApproved()
+Staking Contract->AAVE Contract: Repay amount required to address Y repay()
+Staking Contract->Staking Contract: Mark repaid and free up locked collateral - fees
+Staking Contract->Credit Oracle Contract: Update score
+Staking Contract-->Reward Token Contract: If not late, transfer reward to address Y mint()
+Reward Token Contract->Address Y: Send reward tokens
+
+title Withdraw
+
+User->Staking Contract: Withdraw X collateral
+Staking Contract->Staking Contract: Check X is free from use as collateral
+Staking Contract->Staking Contract: Reduce collateral to respective value (from withdraw) 
+Staking Contract->AAVE Contract: Withdraw X stake withdraw()
+AAVE Contract->Staking Contract: Transfer WETH
+Staking Contract->Address Y: Transfer WETH to address Y transfer()
